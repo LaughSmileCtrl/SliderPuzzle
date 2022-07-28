@@ -1,5 +1,6 @@
 package com.example.task4_jmp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
@@ -11,6 +12,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -36,32 +38,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         loadViews();
-        showPopup();
-//        loadNumbers();
-//        generateNumbers();
-//        loadDataToViews();
-    }
-
-    private void showPopup() {
-        Button closeBtn;
-        Dialog dialog = new Dialog(this);
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linearLayoutPopup);
-        LayoutInflater layoutInflater = getLayoutInflater();
-        View view = layoutInflater.inflate(R.layout.popup, null);
-
-        closeBtn = view.findViewById(R.id.closePopup);
-        System.out.println(closeBtn.getText().toString());
-        dialog.setContentView(R.layout.popup);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.show();
-
-        closeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println("lol    llllllll                lllllllll    ");
-                dialog.cancel();
-            }
-        });
+        loadNumbers();
+        generateNumbers();
+        loadDataToViews();
     }
 
     private void loadDataToViews() {
@@ -69,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
         emptyY = 3;
 
         for (int i = 0; i < group.getChildCount() - 1; i++) {
-            buttons[i / 4][i % 4].setText(String.valueOf(tiles[i]));
+            String fillText = String.valueOf((char) (64 + tiles[i]));
+            buttons[i / 4][i % 4].setText(fillText);
         }
 
         buttons[emptyX][emptyY].setText("");
@@ -112,6 +92,20 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.reset) {
+            loadNumbers();
+            generateNumbers();
+            loadDataToViews();
+        } else if (item.getItemId() == R.id.exit) {
+            finishAndRemoveTask();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void loadViews() {
         group = findViewById(R.id.group);
         buttons = new Button[4][4];
@@ -138,7 +132,8 @@ public class MainActivity extends AppCompatActivity {
 
         if ((Math.abs(emptyX - x) == 1 && emptyY == y)
                 || Math.abs(emptyY - y) == 1 && emptyX == x) {
-            buttons[emptyX][emptyY].setText(button.getText().toString());
+            String fillText = button.getText().toString();
+            buttons[emptyX][emptyY].setText(fillText);
             buttons[emptyX][emptyY].setBackgroundColor(resources.getColor(R.color.purple_500));
             button.setText("");
             button.setBackgroundColor(Color.WHITE);
@@ -152,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         boolean isWin = false;
         if (emptyX == 3 && emptyY == 3) {
             for (int i = 0; i < (group.getChildCount() - 1); i++) {
-                if (buttons[i / 4][i % 4].getText().toString().equals(String.valueOf(i + 1))) {
+                if (buttons[i / 4][i % 4].getText().toString().equals(String.valueOf((char) (65 + i)))) {
                     isWin = true;
                 } else {
                     isWin = false;
@@ -162,10 +157,21 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (isWin) {
-            Toast.makeText(this, "You Win!!!", Toast.LENGTH_SHORT).show();
-            for (int i = 0; i < group.getChildCount(); i++) {
-                buttons[i / 4][i % 4].setClickable(false);
-            }
+            showPopup();
+            loadNumbers();
+            generateNumbers();
+            loadDataToViews();
         }
+    }
+
+    private void showPopup() {
+        Dialog dialog = new Dialog(this);
+        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linearLayoutPopup);
+        LayoutInflater layoutInflater = getLayoutInflater();
+        View view = layoutInflater.inflate(R.layout.popup, null);
+
+        dialog.setContentView(R.layout.popup);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
     }
 }
